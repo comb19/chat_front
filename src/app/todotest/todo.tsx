@@ -12,7 +12,7 @@ export default function CreateTodo() {
         e.preventDefault();
         const body = JSON.stringify({ title, description });
         console.log(body);
-        const res = await fetch('http://localhost:8080/todos', {
+        const res = await fetch('http://localhost:3001/todos', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
