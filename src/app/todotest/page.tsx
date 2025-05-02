@@ -12,7 +12,7 @@ export default function Home() {
   useEffect(() => {
     async function fetchTodos() {
       const token = await getToken();
-      const response =  await fetch('http://localhost:3001/todos', {
+      const response =  await fetch(process.env.NEXT_PUBLIC_API_URL! + "/todos", {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
