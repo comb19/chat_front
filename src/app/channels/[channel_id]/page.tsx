@@ -20,7 +20,7 @@ export default function Page({
     const formData = new FormData(e.currentTarget);
     socketRef.current?.send(
       JSON.stringify({
-        action: 'message',
+        action: 'send',
         channel_id: channel_id,
         content: formData.get('message'),
       })
@@ -76,7 +76,7 @@ export default function Page({
         console.log('WebSocket connection established');
         socket.send(
           JSON.stringify({
-            user_id: 'user_id',
+            action: 'authorization',
             channel_id: channel_id,
             token: token,
           })
