@@ -18,6 +18,7 @@ export default function Page({
     console.log('handleSubmit');
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
+    console.log(socketRef.current);
     socketRef.current?.send(
       JSON.stringify({
         action: 'send',
@@ -41,9 +42,7 @@ export default function Page({
           },
         }
       );
-      console.log('unti');
       const data = await messages.json();
-      console.log('init fetch');
       console.log(data);
       console.log(Array.isArray(data));
       if (Array.isArray(data)) {
@@ -95,6 +94,9 @@ export default function Page({
 
       socket.addEventListener('open', onOpen);
       socket.addEventListener('message', onMessage);
+      socket.addEventListener('close', () => {
+        console.log('websocket closed!');
+      });
 
       return () => {
         console.log('WebSocket connection closed');
