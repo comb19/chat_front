@@ -1,0 +1,8 @@
+node_modules/
+.clerk
+.github
+.next/
+public/
+package-lock.json
+package.json
+next.config.js
