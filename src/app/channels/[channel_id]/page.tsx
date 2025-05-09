@@ -24,7 +24,7 @@ export default function Page({
         action: 'send',
         channel_id: channel_id,
         content: formData.get('message'),
-      })
+      }),
     );
   };
 
@@ -40,7 +40,7 @@ export default function Page({
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
       const data = await messages.json();
       console.log(data);
@@ -55,7 +55,7 @@ export default function Page({
               channel_id: msg.channel_id,
               content: msg.content,
             } as Message;
-          })
+          }),
         );
       }
       console.log('finished to get messages');
@@ -67,7 +67,7 @@ export default function Page({
     const establishWebSocketConnection = async () => {
       const token = await getToken();
       const socket = new WebSocket(
-        process.env.NEXT_PUBLIC_API_URL + '/ws/messages/' + channel_id
+        process.env.NEXT_PUBLIC_API_URL + '/ws/messages/' + channel_id,
       );
       socketRef.current = socket;
 
@@ -78,7 +78,7 @@ export default function Page({
             action: 'authorization',
             channel_id: channel_id,
             token: token,
-          })
+          }),
         );
       };
       const onMessage = (event: MessageEvent<string>) => {
