@@ -1,8 +1,8 @@
-export {}
+export {};
 
 declare global {
   interface CustomJwtSessionClaims {
-    fullName?: string
-    primaryEmail?: string
+    fullName?: string;
+    primaryEmail?: string;
   }
 }

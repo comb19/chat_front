@@ -18,12 +18,13 @@ export default function Page({
     console.log('handleSubmit');
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
+    console.log(socketRef.current);
     socketRef.current?.send(
       JSON.stringify({
-        action: 'message',
+        action: 'send',
         channel_id: channel_id,
         content: formData.get('message'),
-      })
+      }),
     );
   };
 
@@ -39,11 +40,9 @@ export default function Page({
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
-      console.log('unti');
       const data = await messages.json();
-      console.log('init fetch');
       console.log(data);
       console.log(Array.isArray(data));
       if (Array.isArray(data)) {
@@ -56,7 +55,7 @@ export default function Page({
               channel_id: msg.channel_id,
               content: msg.content,
             } as Message;
-          })
+          }),
         );
       }
       console.log('finished to get messages');
@@ -68,7 +67,7 @@ export default function Page({
     const establishWebSocketConnection = async () => {
       const token = await getToken();
       const socket = new WebSocket(
-        process.env.NEXT_PUBLIC_API_URL + '/ws/messages/' + channel_id
+        process.env.NEXT_PUBLIC_API_URL + '/ws/messages/' + channel_id,
       );
       socketRef.current = socket;
 
@@ -76,10 +75,10 @@ export default function Page({
         console.log('WebSocket connection established');
         socket.send(
           JSON.stringify({
-            user_id: 'user_id',
+            action: 'authorization',
             channel_id: channel_id,
             token: token,
-          })
+          }),
         );
       };
       const onMessage = (event: MessageEvent<string>) => {
@@ -95,6 +94,9 @@ export default function Page({
 
       socket.addEventListener('open', onOpen);
       socket.addEventListener('message', onMessage);
+      socket.addEventListener('close', () => {
+        console.log('websocket closed!');
+      });
 
       return () => {
         console.log('WebSocket connection closed');
