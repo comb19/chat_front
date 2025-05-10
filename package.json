@@ -6,8 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint --dir src/**/*.{ts,tsx}",
-    "fmt": "prettier --write src/**/*.{ts,tsx}",
+    "lint": "next lint --dir src --ext .js,.jsx,.ts,.tsx",
+    "fmt": "prettier --write src",
     "prepare": "husky"
   },
   "dependencies": {
