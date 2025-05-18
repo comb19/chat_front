@@ -1,17 +1,22 @@
 'use client';
 
 import MessageItem from '@/components/message';
+import GetAChannel from '@/lib/get_a_channel';
+import GetMessages from '@/lib/get_messages';
 import { useAuth } from '@clerk/nextjs';
 import { FormEventHandler, use, useEffect, useRef, useState } from 'react';
 
 export default function Page({
   params,
 }: {
-  params: Promise<{ channel_id: string }>;
+  params: Promise<{ guildID: string; channelID: string }>;
 }) {
-  const { channel_id } = use(params);
+  const { channelID } = use(params);
   const { getToken } = useAuth();
   const socketRef = useRef<WebSocket | null>(null);
+  const [channel, setChannel] = useState<ResponseChannel | undefined>(
+    undefined,
+  );
   const [messages, setMessages] = useState<Message[]>([]);
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
@@ -22,27 +27,26 @@ export default function Page({
     socketRef.current?.send(
       JSON.stringify({
         action: 'send',
-        channel_id: channel_id,
+        channel_id: channelID,
         content: formData.get('message'),
       }),
     );
   };
 
   useEffect(() => {
+    const fetchChannel = async () => {
+      const token = await getToken();
+      const channel = await GetAChannel(token!, channelID);
+      setChannel(channel);
+    };
+    fetchChannel();
+  }, [getToken, channelID]);
+
+  useEffect(() => {
     const fetchMessages = async () => {
       console.log('get messages');
       const token = await getToken();
-      const messages = await fetch(
-        process.env.NEXT_PUBLIC_API_URL! + '/messages/' + channel_id,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-      const data = await messages.json();
+      const data = await GetMessages(token!, channelID);
       console.log(data);
       console.log(Array.isArray(data));
       if (Array.isArray(data)) {
@@ -54,6 +58,7 @@ export default function Page({
               user_name: msg.user_name,
               channel_id: msg.channel_id,
               content: msg.content,
+              created_at: msg.created_at,
             } as Message;
           }),
         );
@@ -61,13 +66,13 @@ export default function Page({
       console.log('finished to get messages');
     };
     fetchMessages();
-  }, [channel_id, getToken]);
+  }, [channelID, getToken]);
 
   useEffect(() => {
     const establishWebSocketConnection = async () => {
       const token = await getToken();
       const socket = new WebSocket(
-        process.env.NEXT_PUBLIC_API_URL + '/ws/messages/' + channel_id,
+        process.env.NEXT_PUBLIC_API_URL + '/ws/messages/' + channelID,
       );
       socketRef.current = socket;
 
@@ -76,7 +81,7 @@ export default function Page({
         socket.send(
           JSON.stringify({
             action: 'authorization',
-            channel_id: channel_id,
+            channel_id: channelID,
             token: token,
           }),
         );
@@ -106,19 +111,27 @@ export default function Page({
       };
     };
     establishWebSocketConnection();
-  }, [channel_id, getToken]);
+  }, [channelID, getToken]);
 
   return (
-    <div>
-      <h1>Channel ID: {channel_id}</h1>
-      {messages.map((message: Message) => MessageItem(message))}
-      <form onSubmit={handleSubmit}>
-        <textarea
-          name="message"
-          placeholder="Type your message here"
-        ></textarea>
-        <input type="submit" value="Send" />
-      </form>
+    <div className="flex-grow flex flex-col">
+      <div className="w-full border-b border-b-border h-18 p-1">
+        <h1 className="text-3xl"># {channel?.name}</h1>
+        <p>{channel?.description}</p>
+      </div>
+      <div className="flex-1 flex flex-col h-full pb-4 px-1">
+        <ul className="flex-1 h-full">
+          {messages.map((message: Message) => MessageItem(message))}
+        </ul>
+        <form onSubmit={handleSubmit} className="flex w-full h-8 bottom-0">
+          <textarea
+            name="message"
+            placeholder="Type your message here"
+            className="flex-grow border border-border resize-none mr-1 px-1"
+          ></textarea>
+          <input type="submit" value=">" className="w-8 bg-accent" />
+        </form>
+      </div>
     </div>
   );
 }

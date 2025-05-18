@@ -4,6 +4,6 @@ type Message = {
   user_name: string;
   channel_id: string;
   content: string;
-  created_at: Date;
-  updated_at: Date;
+  created_at: string;
+  updated_at: string;
 };
