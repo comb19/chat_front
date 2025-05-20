@@ -33,7 +33,15 @@ export function ChannelBox({
   );
 }
 
-export function AddChannelBox({ guildID }: { guildID: string }) {
+export function AddChannelBox({
+  guildID,
+  setChannels,
+}: {
+  guildID: string;
+  setChannels: React.Dispatch<
+    React.SetStateAction<ResponseChannel[] | undefined>
+  >;
+}) {
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
 
   return (
@@ -47,7 +55,11 @@ export function AddChannelBox({ guildID }: { guildID: string }) {
         </button>
       </ChannelBoxLayout>
       {isOpenModal && (
-        <CreateChannelModal guildID={guildID} setIsOpen={setIsOpenModal} />
+        <CreateChannelModal
+          guildID={guildID}
+          setIsOpen={setIsOpenModal}
+          setChannels={setChannels}
+        />
       )}
     </>
   );
@@ -56,12 +68,17 @@ export function AddChannelBox({ guildID }: { guildID: string }) {
 export function CreateChannelModal({
   guildID,
   setIsOpen,
+  setChannels,
 }: {
   guildID: string;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setChannels: React.Dispatch<
+    React.SetStateAction<ResponseChannel[] | undefined>
+  >;
 }) {
   const { getToken } = useAuth();
   const actionCreateChannel = async (formData: FormData) => {
+    console.log('submit to create a channel');
     const token = await getToken();
     if (token == undefined) {
       redirect('/');
@@ -70,8 +87,19 @@ export function CreateChannelModal({
       name: formData.get('name'),
       description: formData.get('description'),
     } as RequestChannel;
-    PostCreateChannel(token, guildID, requestChannel);
+    const newChannel = await PostCreateChannel(token, guildID, requestChannel);
+    if (!newChannel) {
+      return;
+    }
     setIsOpen(false);
+    setChannels((channels) => {
+      console.log(newChannel);
+      if (channels) {
+        return [...channels, newChannel];
+      } else {
+        return [newChannel];
+      }
+    });
   };
 
   return (

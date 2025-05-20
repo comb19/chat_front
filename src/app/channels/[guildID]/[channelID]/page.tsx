@@ -71,6 +71,9 @@ export default function Page({
   useEffect(() => {
     const establishWebSocketConnection = async () => {
       const token = await getToken();
+      if (socketRef.current != null) {
+        return;
+      }
       const socket = new WebSocket(
         process.env.NEXT_PUBLIC_API_URL + '/ws/messages/' + channelID,
       );

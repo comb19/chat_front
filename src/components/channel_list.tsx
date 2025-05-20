@@ -53,7 +53,7 @@ export default function ChannelList({ guildID }: { guildID: string }) {
       ) : (
         <div>loading</div>
       )}
-      <AddChannelBox guildID={guildID} />
+      <AddChannelBox guildID={guildID} setChannels={setChannels} />
     </div>
   );
 }
