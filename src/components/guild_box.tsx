@@ -32,7 +32,11 @@ export function GuildBox({
   );
 }
 
-export function AddGuildBox() {
+export function AddGuildBox({
+  setGuilds,
+}: {
+  setGuilds: React.Dispatch<React.SetStateAction<ResponseGuild[] | undefined>>;
+}) {
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
 
   return (
@@ -45,15 +49,19 @@ export function AddGuildBox() {
           +
         </button>
       </GuildBoxLayout>
-      {isOpenModal && <CreateGuildModal setIsOpen={setIsOpenModal} />}
+      {isOpenModal && (
+        <CreateGuildModal setIsOpen={setIsOpenModal} setGuilds={setGuilds} />
+      )}
     </>
   );
 }
 
 export function CreateGuildModal({
   setIsOpen,
+  setGuilds,
 }: {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setGuilds: React.Dispatch<React.SetStateAction<ResponseGuild[] | undefined>>;
 }) {
   const { getToken } = useAuth();
   const actionCreateGuild = async (formData: FormData) => {
@@ -65,8 +73,15 @@ export function CreateGuildModal({
       name: formData.get('name'),
       description: formData.get('description'),
     } as RequestChannel;
-    PostCreateGuild(token, requestGuild);
+    const newGuild = await PostCreateGuild(token, requestGuild);
     setIsOpen(false);
+    setGuilds((guilds) => {
+      if (guilds) {
+        return [...guilds, newGuild];
+      } else {
+        return [newGuild];
+      }
+    });
   };
 
   return (

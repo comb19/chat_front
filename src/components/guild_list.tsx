@@ -52,7 +52,7 @@ export default function GuilList() {
           />
         ))
       )}
-      <AddGuildBox />
+      <AddGuildBox setGuilds={setGuilds} />
     </ul>
   );
 }

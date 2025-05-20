@@ -1,3 +1,5 @@
+'use client';
+import { CreateNewGuildInvitation } from '@/components/guild_invitation';
 import GuilList from '@/components/guild_list';
 import {
   SignedIn,
@@ -6,15 +8,22 @@ import {
   SignUpButton,
   UserButton,
 } from '@clerk/nextjs';
+import { useParams } from 'next/navigation';
+import { useState } from 'react';
 
 export default function Layout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const params = useParams();
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   return (
     <div className=" h-screen flex flex-col overflow-y-hidden">
       <header className="flex justify-end items-center p-4 gap-4 h-10 border-b-2 border-b-border">
+        {typeof params.guildID == 'string' && (
+          <button onClick={() => setIsOpen(true)}>招待</button>
+        )}
         <SignedOut>
           <SignInButton />
           <SignUpButton />
@@ -27,6 +36,12 @@ export default function Layout({
         <GuilList />
         {children}
       </div>
+      {typeof params.guildID == 'string' && isOpen && (
+        <CreateNewGuildInvitation
+          guildID={params.guildID}
+          setIsOpen={setIsOpen}
+        />
+      )}
     </div>
   );
 }
