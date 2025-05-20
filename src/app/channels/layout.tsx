@@ -1,6 +1,6 @@
 'use client';
 import { CreateNewGuildInvitation } from '@/components/guild_invitation';
-import GuilList from '@/components/guild_list';
+import GuildList from '@/components/guild_list';
 import {
   SignedIn,
   SignedOut,
@@ -33,7 +33,7 @@ export default function Layout({
         </SignedIn>
       </header>
       <div className="flex-1 flex divide-x-1 divide-border w-screen h-full">
-        <GuilList />
+        <GuildList />
         {children}
       </div>
       {typeof params.guildID == 'string' && isOpen && (
