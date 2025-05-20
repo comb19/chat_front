@@ -20,6 +20,12 @@ export default function Page({
   const [messages, setMessages] = useState<Message[]>([]);
   const [message, setMessage] = useState<string>('');
 
+  const handleEnter = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.code == 'Enter' && (e.ctrlKey || e.metaKey)) {
+      handleSend();
+    }
+  };
+
   const handleSend = () => {
     if (message.length == 0) {
       return;
@@ -118,7 +124,7 @@ export default function Page({
   }, [channelID, getToken]);
 
   return (
-    <div className="flex-grow">
+    <div className="flex-grow" onKeyDown={handleEnter}>
       <div className="w-full border-b border-b-border h-18 p-1">
         <h1 className="text-3xl"># {channel?.name}</h1>
         <p>{channel?.description}</p>
