@@ -19,7 +19,7 @@ export default function Layout({
   const params = useParams();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   return (
-    <div className=" h-screen flex flex-col overflow-y-hidden">
+    <div className="overflow-y-hidden h-screen flex flex-col">
       <header className="flex justify-end items-center p-4 gap-4 h-10 border-b-2 border-b-border">
         {typeof params.guildID == 'string' && (
           <button onClick={() => setIsOpen(true)}>招待</button>
