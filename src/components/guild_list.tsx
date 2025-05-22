@@ -6,7 +6,7 @@ import GetGuilds from '@/lib/get_guilds';
 import { AddGuildBox, GuildBox } from './guild_box';
 import { redirect, useParams } from 'next/navigation';
 
-export default function GuilList() {
+export default function GuildList() {
   const { getToken } = useAuth();
   const [guilds, setGuilds] = useState<ResponseGuild[] | undefined>(undefined);
   const params = useParams();
@@ -52,7 +52,7 @@ export default function GuilList() {
           />
         ))
       )}
-      <AddGuildBox />
+      <AddGuildBox setGuilds={setGuilds} />
     </ul>
   );
 }

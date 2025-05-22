@@ -4,7 +4,7 @@ import MessageItem from '@/components/message';
 import GetAChannel from '@/lib/get_a_channel';
 import GetMessages from '@/lib/get_messages';
 import { useAuth } from '@clerk/nextjs';
-import { FormEventHandler, use, useEffect, useRef, useState } from 'react';
+import { use, useEffect, useRef, useState } from 'react';
 
 export default function Page({
   params,
@@ -18,19 +18,26 @@ export default function Page({
     undefined,
   );
   const [messages, setMessages] = useState<Message[]>([]);
+  const [message, setMessage] = useState<string>('');
 
-  const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
-    console.log('handleSubmit');
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    console.log(socketRef.current);
+  const handleEnter = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.code == 'Enter' && (e.ctrlKey || e.metaKey)) {
+      handleSend();
+    }
+  };
+
+  const handleSend = () => {
+    if (message.length == 0) {
+      return;
+    }
     socketRef.current?.send(
       JSON.stringify({
         action: 'send',
         channel_id: channelID,
-        content: formData.get('message'),
+        content: message,
       }),
     );
+    setMessage('');
   };
 
   useEffect(() => {
@@ -71,6 +78,9 @@ export default function Page({
   useEffect(() => {
     const establishWebSocketConnection = async () => {
       const token = await getToken();
+      if (socketRef.current != null) {
+        return;
+      }
       const socket = new WebSocket(
         process.env.NEXT_PUBLIC_API_URL + '/ws/messages/' + channelID,
       );
@@ -114,23 +124,26 @@ export default function Page({
   }, [channelID, getToken]);
 
   return (
-    <div className="flex-grow flex flex-col">
+    <div className="flex-grow" onKeyDown={handleEnter}>
       <div className="w-full border-b border-b-border h-18 p-1">
         <h1 className="text-3xl"># {channel?.name}</h1>
         <p>{channel?.description}</p>
       </div>
-      <div className="flex-1 flex flex-col h-full pb-4 px-1">
-        <ul className="flex-1 h-full">
+      <div className="pb-4 px-1">
+        <ul className="h-[calc(100vh-var(--spacing)*38)] overflow-y-scroll">
           {messages.map((message: Message) => MessageItem(message))}
         </ul>
-        <form onSubmit={handleSubmit} className="flex w-full h-8 bottom-0">
+        <div className="flex w-full h-10 py-1">
           <textarea
-            name="message"
             placeholder="Type your message here"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
             className="flex-grow border border-border resize-none mr-1 px-1"
           ></textarea>
-          <input type="submit" value=">" className="w-8 bg-accent" />
-        </form>
+          <button onClick={handleSend} className="w-8 bg-accent">
+            {'>'}
+          </button>
+        </div>
       </div>
     </div>
   );

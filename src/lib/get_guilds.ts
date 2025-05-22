@@ -9,6 +9,5 @@ export default async function GetGuilds(
     },
   });
   const responseGuilds = await fetchData.json();
-  console.log(responseGuilds);
   return responseGuilds;
 }

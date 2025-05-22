@@ -13,6 +13,5 @@ export default async function GetChannels(
     },
   );
   const responseChannels = await fetchData.json();
-  console.log(responseChannels);
   return responseChannels;
 }
